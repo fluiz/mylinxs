@@ -9,6 +9,12 @@
 
     let debounceTimer: NodeJS.Timeout;
 
+    const validationRe = /^(?=[a-zA-Z0-9._]{3,16}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
+
+    $: isValid = username?.length > 2 && username?.length < 16 && validationRe.test(username);
+    $: isTouched = username.length > 0;
+    $: isTaken = isValid && !isAvailable && !loading;
+
     async function checkAvailability() {
         isAvailable = false;
         clearTimeout(debounceTimer);
@@ -27,7 +33,27 @@
     }
 
     async function confirmUsername() {
-        // TODO
+        console.log("confirming username ", username);
+        const batch = writeBatch(db);
+        batch.set(doc(db, "usernames", username), { uid: $user?.uid });
+        batch.set(doc(db, "users", $user!.uid), {
+            username,
+            photoUrl: $user?.photoURL ?? null,
+            published: true,
+            bio: 'My bio',
+            links: [
+                {
+                    title: 'Test link',
+                    url: ' http://localhost:5173/',
+                    icon: 'custom'
+                }
+            ]
+        });
+
+        await batch.commit();
+
+        username = '';
+        isAvailable = false;
     }
 </script>
 
@@ -40,10 +66,30 @@
                 class="input w-full"
                 bind:value={username}
                 on:input={checkAvailability}
+                class:input-error={(!isValid && isTouched)}
+                class:input-warning={isTaken}
+                class:input-success={isAvailable && isValid && !loading}
         />
+        <div class="my-4 min-h-16 px-8 w-full">
+            {#if loading}
+                <p class="text-secondary">Checking availability of @{username}...</p>
+            {/if}
 
-        <p>Is available? {isAvailable}</p>
+            {#if !isValid && isTouched}
+                <p class="text-error text-sm">
+                    must be 3-16 characters long, alpha only
+                </p>
+            {/if}
 
-        <button class="btn btn-success">Confirm username @{username} </button>
+            {#if isValid && !isAvailable && !loading}
+                <p class="text-warning text-sm">
+                    @{username} is not available
+                </p>
+            {/if}
+
+            {#if isAvailable}
+                <button class="btn btn-success">Confirm username @{username} </button>
+            {/if}
+        </div>
     </form>
 </AuthCheck>
