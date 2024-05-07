@@ -1,15 +1,11 @@
 <script lang="ts">
+    import { user, userData } from "$lib/firebase";
     import "../app.css";
-    import { goto } from '$app/navigation';
 
-
-
-    // function moveOn() {
-    //     goto('login');
-    // }
+    $user;
+    $userData;
 </script>
 
 <div class="min-h-screen flex flex-col">
-<!--    <button class="btn" on:click={moveOn}>Move on</button>-->
     <slot />
 </div>

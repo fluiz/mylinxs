@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
-import {derived, type Readable, writable} from "svelte/store";
+import { derived, type Readable, writable } from "svelte/store";
 import { type User, onAuthStateChanged } from "firebase/auth"
 
 // Your web app's Firebase configuration
