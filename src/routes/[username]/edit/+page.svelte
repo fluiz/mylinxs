@@ -10,6 +10,7 @@
         updateDoc
     } from "firebase/firestore"
     import { writable } from "svelte/store"
+    import SortableList from "$lib/components/SortableList.svelte";
 
     const icons = [
         "Twitter",
@@ -64,6 +65,12 @@
         formData.set(formDefaults)
         showForm = false
     }
+
+    function sortList(e: CustomEvent) {
+        const newList = e.detail;
+        const userRef = doc(db, "users", $user!.uid);
+        setDoc(userRef, { links: newList }, { merge: true });
+    }
 </script>
 
 
@@ -73,7 +80,16 @@
             Edit your Profile
         </h1>
 
-        <!-- INSERT sortable list here -->
+        <SortableList list={$userData?.links} on:sort={sortList} let:item let:index>
+            <div class="group relative">
+                <UserLink {...item} />
+                <button
+                        on:click={() => deleteLink(item)}
+                        class="btn btn-xs btn-error invisible group-hover:visible transition-all absolute -right-6 bottom-10"
+                >Delete</button
+                >
+            </div>
+        </SortableList>
 
         {#if showForm}
             <form
