@@ -9,6 +9,7 @@ export const handle = (async ({ event, resolve }) => {
         event.locals.userId = decodedClaims.uid
         console.log("found user id", decodedClaims.uid)
     } catch (e) {
+        console.error(e)
         event.locals.userId = null
         return resolve(event)
     }
