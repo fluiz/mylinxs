@@ -1,6 +1,5 @@
 <script>
     import { userData } from "$lib/firebase";
-
 </script>
 
 <svelte:head>
